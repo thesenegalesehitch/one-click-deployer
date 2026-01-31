@@ -1,30 +1,41 @@
-# The 1-Click Deployer
+# Le Déploiement en Un Clic
 
-A Bash script to instantly initialize a Git repository and deploy it to a new private GitHub repository.
+Un script Bash pour initialiser instantanément un dépôt Git et le déployer vers un nouveau dépôt GitHub privé.
 
-## Prerequisites
+## Prérequis
 
-- **Git**: Installed and configured.
-- **GitHub CLI (`gh`)**: Installed and authenticated (`gh auth login`).
+- **Git** : Installé et configuré.
+- **GitHub CLI (`gh`)** : Installé et authentifié (`gh auth login`).
 
-## Features
+## Fonctionnalités
 
-- **Automated Init**: Initializes Git if not present.
-- **Smart Gitignore**: Generates a universal `.gitignore` for common languages.
-- **Instant Deployment**: Creates a private GitHub repository and pushes the code in one command.
+- **Initialisation Automatique** : Initialise Git s'il n'est pas présent.
+- **Gitignore Intelligent** : Génère un `.gitignore` universel pour les langages courants.
+- **Déploiement Instantané** : Crée un dépôt GitHub privé et pousse le code en une seule commande.
 
-## Usage
+## Utilisation
 
-1.  Make the script executable:
+1.  Rendez le script exécutable :
     ```bash
     chmod +x deploy.sh
     ```
-2.  Run inside your project directory:
+2.  Exécutez dans votre répertoire de projet :
     ```bash
     ./deploy.sh
     ```
 
-## License
+## Structure du Projet
+
+```
+one-click-deployer/
+├── deploy.sh        # Script principal de déploiement
+├── README.md        # Documentation
+├── LICENSE          # Licence
+└── tests/
+    └── test_deploy.sh # Tests du script
+```
+
+## Licence
 
 Copyright (c) 27 Janvier 2026 - Antigravity
-See [LICENSE](LICENSE) for details.
+Voir [LICENSE](LICENSE) pour plus de détails.
