@@ -10,7 +10,7 @@
 # 4. Crée un dépôt GitHub privé (si inexistant)
 # 5. Pousse le code vers GitHub
 #
-# @author Antigravity
+# @author Alexandre Albert Ndour
 # @version 1.0.0
 # @date Janvier 2026
 # =============================================================================

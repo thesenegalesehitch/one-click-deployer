@@ -11,7 +11,7 @@
 # @note Ces tests sont des tests de base car il est difficile de mocker
 #       les commandes système dans un script bash sans modification.
 #
-# @author Antigravity
+# @author Alexandre Albert Ndour
 # @version 1.0.0
 # @date Janvier 2026
 # =============================================================================
