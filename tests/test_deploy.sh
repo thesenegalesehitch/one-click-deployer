@@ -1,45 +1,87 @@
 #!/bin/bash
+# =============================================================================
+# @file test_deploy.sh
+# @description Tests unitaires pour le script de déploiement deploy.sh
+# 
+# Ce fichier contient des tests basiques pour vérifier :
+# - La syntaxe du script deploy.sh
+# - L'existence du fichier de script
+# - Les mocks des commandes git et gh
+#
+# @note Ces tests sont des tests de base car il est difficile de mocker
+#       les commandes système dans un script bash sans modification.
+#
+# @author Antigravity
+# @version 1.0.0
+# @date Janvier 2026
+# =============================================================================
 
-# Test script for Deployer (Dry Run Mock)
+# -----------------------------------------------------------------------------
+# Configuration des mocks pour les commandes système
+# -----------------------------------------------------------------------------
 
-# Mock git
+# Mock de la commande git
+# Simule les appels à git et affiche les arguments reçus
 git() {
-    echo "Called git with args: $@"
+    echo "Appel de git avec les arguments : $@"
 }
 
-# Mock gh
+# Mock de la commande gh (GitHub CLI)
+# Simule les différents comportements de gh :
+# - auth : retourne succès (authentification simulée)
+# - repo view : retourne erreur (dépôt inexistant simulé)
 gh() {
-    echo "Called gh with args: $@"
+    echo "Appel de gh avec les arguments : $@"
+    
+    # Simulation de la vérification d'authentification
     if [[ "$1" == "auth" ]]; then
-        return 0 # simulate auth success
+        return 0  # Succès simulés
+    # Simulation de la vérification d'existence du dépôt
     elif [[ "$1" == "repo" && "$2" == "view" ]]; then
-        return 1 # simulate repo not existing
+        return 1  # Erreur : dépôt inexistant
     fi
 }
 
-deploy_script="../deploy.sh"
+# Chemin du script de déploiement à tester
+SCRIPT_DEPLOY="../deploy.sh"
 
-echo "Running test for deploy.sh..."
+# -----------------------------------------------------------------------------
+# Exécution des tests
+# -----------------------------------------------------------------------------
 
-# Temporarily override commands in the script context? 
-# Hard to mock inside a script without modifying the script to use variables for commands.
-# Instead, we can't easily unit test a bash script that calls system binaries without dependency injection.
+echo "Exécution des tests pour deploy.sh..."
 
-# Workaround: Check syntax
-bash -n "$deploy_script"
+# -----------------------------------------------------------------------------
+# Test 1 : Vérification de la syntaxe du script
+# -----------------------------------------------------------------------------
+# La commande 'bash -n' vérifie la syntaxe sans exécuter le script
+# Si le script contient des erreurs de syntaxe, ce test échoue
+
+# Vérification de la syntaxe du script deploy.sh
+bash -n "$SCRIPT_DEPLOY"
+
+# Vérification du code de retour de la commande
 if [ $? -eq 0 ]; then
-    echo "Syntax check OK"
+    echo "Vérification de la syntaxe : OK"
 else
-    echo "Syntax check FAILED"
+    echo "Vérification de la syntaxe : ÉCHOUÉE"
     exit 1
 fi
 
-# Basic execution test (Dry Run logic is not present in original script, so we just check existence)
-if [ -f "$deploy_script" ]; then
-    echo "Script exists."
+# -----------------------------------------------------------------------------
+# Test 2 : Vérification de l'existence du script
+# -----------------------------------------------------------------------------
+
+# Vérification que le fichier de script existe
+if [ -f "$SCRIPT_DEPLOY" ]; then
+    echo "Le script existe."
 else
-    echo "Script missing."
+    echo "Le script est manquant."
     exit 1
 fi
 
-echo "All checks passed."
+# -----------------------------------------------------------------------------
+# Résumé des tests
+# -----------------------------------------------------------------------------
+
+echo "Tous les contrôles ont réussi."

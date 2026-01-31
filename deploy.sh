@@ -1,71 +1,126 @@
 #!/bin/bash
+# =============================================================================
+# @file deploy.sh
+# @description Script de déploiement en un clic vers GitHub
+# 
+# Ce script automatise le processus de déploiement d'un projet vers GitHub :
+# 1. Vérifie les dépendances (Git, GitHub CLI)
+# 2. Initialise ou vérifie le dépôt Git local
+# 3. Génère un fichier .gitignore universel
+# 4. Crée un dépôt GitHub privé (si inexistant)
+# 5. Pousse le code vers GitHub
+#
+# @author Antigravity
+# @version 1.0.0
+# @date Janvier 2026
+# =============================================================================
+
+# Sortie en cas d'erreur (arrête le script si une commande échoue)
 set -e
 
-# Colors
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m'
+# -----------------------------------------------------------------------------
+# Configuration des couleurs pour l'affichage dans le terminal
+# -----------------------------------------------------------------------------
+VERT='\033[0;32m'    # Couleur verte pour les messages de succès
+ROUGE='\033[0;31m'   # Couleur rouge pour les messages d'erreur
+NC='\033[0m'         # Aucune couleur (reset)
 
-echo -e "${GREEN}Starting 1-Click Deployer...${NC}"
+# -----------------------------------------------------------------------------
+# Étape 1 : Vérification des dépendances
+# -----------------------------------------------------------------------------
 
-# 1. Check dependencies
+echo -e "${VERT}Démarrage du Déploiement en Un Clic...${NC}"
+
+# Vérification de l'installation de Git
 if ! command -v git &> /dev/null; then
-    echo -e "${RED}Error: git is not installed.${NC}"
+    echo -e "${ROUGE}Erreur : Git n'est pas installé.${NC}"
     exit 1
 fi
 
+# Vérification de l'installation de GitHub CLI (gh)
 if ! command -v gh &> /dev/null; then
-    echo -e "${RED}Error: gh (GitHub CLI) is not installed.${NC}"
+    echo -e "${ROUGE}Erreur : gh (GitHub CLI) n'est pas installé.${NC}"
     exit 1
 fi
 
+# Vérification de l'authentification GitHub CLI
 if ! gh auth status &> /dev/null; then
-    echo -e "${RED}Error: gh is not authenticated. Run 'gh auth login'.${NC}"
+    echo -e "${ROUGE}Erreur : gh n'est pas authentifié. Exécutez 'gh auth login'.${NC}"
     exit 1
 fi
 
-# 2. Check/Init Git
+# -----------------------------------------------------------------------------
+# Étape 2 : Initialisation ou vérification du dépôt Git
+# -----------------------------------------------------------------------------
+
+# Vérification de l'existence du répertoire .git
 if [ ! -d ".git" ]; then
-    echo "Initializing Git repository..."
+    echo "Initialisation du dépôt Git..."
     git init
 else
-    echo "Git repository already initialized."
+    echo "Dépôt Git déjà initialisé."
 fi
 
-# 3. Generate .gitignore
+# -----------------------------------------------------------------------------
+# Étape 3 : Génération du fichier .gitignore
+# -----------------------------------------------------------------------------
+
+# Vérification de l'existence du fichier .gitignore
 if [ ! -f ".gitignore" ]; then
-    echo "Generating universal .gitignore..."
+    echo "Génération du fichier .gitignore universel..."
+    
+    # Création du fichier .gitignore avec les patterns courants
     cat <<EOF > .gitignore
-# General
+# Fichiers système
 .DS_Store
+
+# Fichiers de log
 *.log
+
+# Node.js
 node_modules/
 dist/
-build/
 .env
+
+# Python
 __pycache__/
 *.pyc
 venv/
+
+# Builds
+build/
 bin/
 obj/
 EOF
-    echo ".gitignore created."
+    
+    echo "Fichier .gitignore créé."
 fi
 
-# 4. Create Remote Repo
-PROJECT_NAME=$(basename "$PWD")
-echo "Creating GitHub repository: $PROJECT_NAME"
+# -----------------------------------------------------------------------------
+# Étape 4 : Création du dépôt GitHub distant
+# -----------------------------------------------------------------------------
 
-# Check if repo exists
-if gh repo view "$PROJECT_NAME" &> /dev/null; then
-    echo "Repository already exists."
+# Extraction du nom du projet à partir du chemin courant
+NOM_PROJET=$(basename "$PWD")
+echo "Création du dépôt GitHub : $NOM_PROJET"
+
+# Vérification de l'existence du dépôt distant
+if gh repo view "$NOM_PROJET" &> /dev/null; then
+    echo "Le dépôt existe déjà."
 else
-    # Default to private, can be changed
-    gh repo create "$PROJECT_NAME" --private --source=. --remote=origin --push
-    echo -e "${GREEN}Repository created successfully!${NC}"
-    echo "View it at: https://github.com/$(gh api user -q .login)/$PROJECT_NAME"
+    # Création du dépôt privé et poussée du code
+    # --private : dépôt privé
+    # --source=. : pousse depuis le répertoire courant
+    # --remote=origin : nom du remote
+    # --push : pousse immédiatement après création
+    gh repo create "$NOM_PROJET" --private --source=. --remote=origin --push
+    echo -e "${VERTDépôt créé avec succès !${NC}"
+    echo "Consultez-le à : https://github.com/$(gh api user -q .login)/$NOM_PROJET"
 fi
 
-# 5. Success
-echo -e "${GREEN}Deployment Complete!${NC}"
-echo "Your code is now on GitHub."
+# -----------------------------------------------------------------------------
+# Étape 5 : Fin du déploiement
+# -----------------------------------------------------------------------------
+
+echo -e "${VERT}Déploiement Terminé !${NC}"
+echo "Votre code est maintenant sur GitHub."
